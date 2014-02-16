@@ -9,101 +9,246 @@
 #import "ForwardSelector.h"
 
 
-@implementation ForwardSelector
+@implementation NSObject (invokeSelector)
 
-- (void)invokeSelector:(SEL)selector withTarget:(id<NSObject>)target number:(NSNumber*)number type:(char)type
+- (void *)invokeSelector:(SEL)selector withArguments:(void *)firstArgument, ...
 {
-    NSMethodSignature *signature = [[target class] instanceMethodSignatureForSelector:selector];
-    //NSMethodSignature *signature = [target methodSignatureForSelector:selector];
-    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature: signature];
-    [invocation setTarget: target];
-    [invocation setSelector: selector];
+    NSMethodSignature *signature = [self methodSignatureForSelector:selector];
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setSelector:selector];
     
-    switch (type) {
-            
-        case 'i': // int
+    va_list args;
+    va_start(args, firstArgument);
+    NSUInteger numberOfArgs = [signature numberOfArguments];
+    void *arg = firstArgument;
+    for (NSUInteger i = 2; i < numberOfArgs; i++)
+    {
+        [invocation setArgument:&arg atIndex:i];
+        if (i + 1 < numberOfArgs)
+            arg = va_arg(args, void *);
+    }
+    va_end(args);
+    
+    [invocation invokeWithTarget:self];
+    
+    switch ([signature methodReturnType][0]) {
+        case 'v': // void
         {
-            int intValue = [number intValue];
-            [invocation setArgument: &intValue atIndex: 2];
+            return nil;
         }
-        case 's': // short
+        default:
         {
-            short shortValue = [number shortValue];
-            [invocation setArgument: &shortValue atIndex: 2];
+            void *pointer;
+            [invocation getReturnValue:&pointer];
+            return pointer;
         }
-        case 'l': // long
-        {
-            long longValue = [number longValue];
-            [invocation setArgument: &longValue atIndex: 2];
+    }
+}
+
+- (id)invokeSelector:(SEL)selector withObjects:(id)firstObject, ...
+{
+    NSMethodSignature *signature = [self methodSignatureForSelector:selector];
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setSelector:selector];
+    
+    va_list args;
+    va_start(args, firstObject);
+    NSUInteger numberOfArgs = [signature numberOfArguments];
+    id arg = firstObject;
+    for (NSUInteger i = 2; i < numberOfArgs; i++)
+    {
+        switch ([signature getArgumentTypeAtIndex:i][0]) {
+            case 'B': // BOOL
+            {
+                BOOL boolValue = [arg boolValue];
+                [invocation setArgument:&boolValue atIndex:i];
+            }
+                break;
+            case 'C': // unsigned char
+            {
+                unsigned char unsignedCharValue = [arg unsignedCharValue];
+                [invocation setArgument:&unsignedCharValue atIndex:i];
+            }
+                break;
+            case 'I': // unsigned int
+            {
+                unsigned int unsignedIntValue = [arg unsignedIntValue];
+                [invocation setArgument:&unsignedIntValue atIndex:i];
+            }
+                break;
+            case 'L': // unsigned long
+            {
+                unsigned long unsignedLongValue = [arg unsignedLongValue];
+                [invocation setArgument:&unsignedLongValue atIndex:i];
+            }
+                break;
+            case 'Q': // unsigned long long
+            {
+                unsigned long long unsignedLongLongValue = [arg unsignedLongLongValue];
+                [invocation setArgument:&unsignedLongLongValue atIndex:i];
+            }
+                break;
+            case 'S': // unsigned short
+            {
+                unsigned short unsignedShortValue = [arg unsignedShortValue];
+                [invocation setArgument:&unsignedShortValue atIndex:i];
+            }
+                break;
+            case 'c': // char
+            {
+                char charValue = [arg charValue];
+                [invocation setArgument:&charValue atIndex:i];
+            }
+                break;
+            case 'd': // double
+            {
+                double doubleValue = [arg doubleValue];
+                [invocation setArgument:&doubleValue atIndex:i];
+            }
+                break;
+            case 'f': // float
+            {
+                float floatValue = [arg floatValue];
+                [invocation setArgument:&floatValue atIndex:i];
+            }
+                break;
+            case 'i': // int
+            {
+                int intValue = [arg intValue];
+                [invocation setArgument:&intValue atIndex:i];
+            }
+                break;
+            case 'l': // long
+            {
+                long longValue = [arg longValue];
+                [invocation setArgument:&longValue atIndex:i];
+            }
+                break;
+            case 'q': // long long
+            {
+                long long longLongValue = [arg longLongValue];
+                [invocation setArgument:&longLongValue atIndex:i];
+            }
+                break;
+            case 's': // short
+            {
+                short shortValue = [arg shortValue];
+                [invocation setArgument:&shortValue atIndex:i];
+            }
+                break;
+            case 'v': // void
+                break;
+            case '@': // id
+            case ':': // SEL
+            default:
+            {
+                [invocation setArgument:&arg atIndex:i];
+            }
+                break;
         }
-        case 'q': // long long
-        {
-            long long longLongValue = [number longLongValue];
-            [invocation setArgument: &longLongValue atIndex: 2];
-        }
-        case 'I': // unsigned int
-        {
-            unsigned int unsignedIntValue = [number unsignedIntValue];
-            [invocation setArgument: &unsignedIntValue atIndex: 2];
-        }
-        case 'S': // unsigned short
-        {
-            unsigned short unsignedShortValue = [number unsignedShortValue];
-            [invocation setArgument: &unsignedShortValue atIndex: 2];
-        }
-        case 'L': // unsigned long
-        {
-            unsigned long unsignedLongValue = [number unsignedLongValue];
-            [invocation setArgument: &unsignedLongValue atIndex: 2];
-        }
-        case 'Q': // unsigned long long
-        {
-            unsigned long long unsignedLongLongValue = [number unsignedLongLongValue];
-            [invocation setArgument: &unsignedLongLongValue atIndex: 2];
-        }
-        case 'f': // float
-        {
-            float floatValue = [number floatValue];
-            [invocation setArgument: &floatValue atIndex: 2];
-        }
-        case 'd': // double
-        {
-            double doubleValue = [number doubleValue];
-            [invocation setArgument: &doubleValue atIndex: 2];
-        }
+        if (i + 1 < numberOfArgs)
+            arg = va_arg(args, id);
+    }
+    va_end(args);
+    
+    [invocation invokeWithTarget:self];
+    
+    switch ([signature methodReturnType][0]) {
         case 'B': // BOOL
         {
-            BOOL boolValue = [number boolValue];
-            [invocation setArgument: &boolValue atIndex: 2];
-        }
-        case 'c': // char
-        {
-            char charValue = [number charValue];
-            [invocation setArgument: &charValue atIndex: 2];
+            BOOL buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithBool:buffer];
         }
         case 'C': // unsigned char
         {
-            unsigned char unsignedCharValue = [number unsignedCharValue];
-            [invocation setArgument: &unsignedCharValue atIndex: 2];
+            unsigned char buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithUnsignedChar:buffer];
         }
-        /*
-        case '': // NSInteger
+        case 'I': // unsigned int
         {
-            NSInteger integerValue = [number integerValue];
-            [invocation setArgument: &integerValue atIndex: 2];
+            unsigned int buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithUnsignedInt:buffer];
         }
-        case '': // NSUInteger
+        case 'L': // unsigned long
         {
-            NSUInteger unsignedIntegerValue = [number unsignedIntegerValue];
-            [invocation setArgument: &unsignedIntegerValue atIndex: 2];
+            unsigned long buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithUnsignedLong:buffer];
         }
-        */
-        case '@': // Object
+        case 'Q': // unsigned long long
+        {
+            unsigned long long buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithUnsignedLongLong:buffer];
+        }
+        case 'S': // unsigned short
+        {
+            unsigned short buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithUnsignedShort:buffer];
+        }
+        case 'c': // char
+        {
+            char buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithChar:buffer];
+        }
+        case 'd': // double
+        {
+            double buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithDouble:buffer];
+        }
+        case 'f': // float
+        {
+            float buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithFloat:buffer];
+        }
+        case 'i': // int
+        {
+            int buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithInt:buffer];
+        }
+        case 'l': // long
+        {
+            long buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithLong:buffer];
+        }
+        case 'q': // long long
+        {
+            long long buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithLongLong:buffer];
+        }
+        case 's': // short
+        {
+            short buffer;
+            [invocation getReturnValue:&buffer];
+            return [NSNumber numberWithShort:buffer];
+        }
+        case 'v': // void
+        {
+            return nil;
+        }
+        case '@': // id
+        case ':': // SEL
         default:
-            break;
+        {
+            //void *pointer;
+            //[invocation getReturnValue:&pointer];
+            //return (__bridge id)pointer;
+            
+            __unsafe_unretained id anObject;
+            [invocation getReturnValue:&anObject];
+            return anObject;
+        }
     }
-    
-    [invocation invoke];
 }
 
 @end

@@ -9,8 +9,10 @@
 #import <Foundation/Foundation.h>
 
 
-@interface ForwardSelector : NSObject
+@interface NSObject (invokeSelector)
 
-- (void)invokeSelector:(SEL)selector withTarget:(id<NSObject>)target number:(NSNumber*)number type:(char)type;
+- (void *)invokeSelector:(SEL)selector withArguments:(void *)firstArgument, ...;
+
+- (id)invokeSelector:(SEL)selector withObjects:(id)object1, ...;
 
 @end

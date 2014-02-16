@@ -54,6 +54,7 @@
 		374E954718AE305300AA8509 /* NSObject+As.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+As.m"; sourceTree = "<group>"; };
 		374E954918AE309600AA8509 /* ForwardSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ForwardSelector.h; sourceTree = "<group>"; };
 		374E954A18AE309600AA8509 /* ForwardSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ForwardSelector.m; sourceTree = "<group>"; };
+		C8DE45A418B0DB780042B9E1 /* CoeurMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoeurMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +155,7 @@
 		374E954518AE303E00AA8509 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				C8DE45A418B0DB780042B9E1 /* CoeurMacros.h */,
 				374E954618AE305300AA8509 /* NSObject+As.h */,
 				374E954718AE305300AA8509 /* NSObject+As.m */,
 				374E954918AE309600AA8509 /* ForwardSelector.h */,
@@ -463,6 +465,7 @@
 				374E954118AE302600AA8509 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		374E954218AE302600AA8509 /* Build configuration list for PBXNativeTarget "HelperTests" */ = {
 			isa = XCConfigurationList;
@@ -471,6 +474,7 @@
 				374E954418AE302600AA8509 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
